@@ -73,9 +73,9 @@ COPY ./measuring_federate /home/measuring_federate
 COPY ./recorder_federate /home/recorder_federate
 COPY ./wls_federate /home/wls_federate
 COPY ./scenario /home/scenario
-COPY ./outputs /home/outputs
 COPY ./requirements.txt /home/requirements.txt
 COPY ./run.sh /home/run.sh
+RUN mkdir -p /home/outputs
 
 WORKDIR /home/
 
