@@ -53,7 +53,7 @@ RUN cd /build \
     && git clone https://github.com/GRIDAPPSD/json \
     && LD_LIBRARY_PATH=/build/gridappsd-state-estimator/SuiteSparse/lib/ make -C SuiteSparse LAPACK=-llapack BLAS=-lblas \
     && make -C state-estimator \
-    && rm -rf SuiteSparse/.git json.git 
+    && rm -rf .git SuiteSparse/.git json/.git 
 
 
 
