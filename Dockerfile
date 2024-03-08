@@ -68,7 +68,16 @@ RUN apt install -y python3 \
 
 
 WORKDIR /home/
-COPY . .
+RUN mkdir outputs
+COPY scenario /home/
+COPY estimator_federate /home/
+COPY feeder_federate /home/
+COPY measuring_federate /home/
+COPY recorder_federate /home/
+COPY wls_federate /home/
+COPY README.md /home/
+COPY requirements.txt /home/
+COPY run.sh /home/
 
 
 RUN pip install -r requirements.txt \

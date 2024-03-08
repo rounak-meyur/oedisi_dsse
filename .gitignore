@@ -1,3 +1,6 @@
 build_*
 __pycache__
 *__pycache__*
+
+json
+SuiteSparse
