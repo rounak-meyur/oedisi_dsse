@@ -1,32 +1,32 @@
 {
-    "name": "dsse_ieee123",
+    "name": "dsse_smartds_large",
     "components": [
         {
             "name": "recorder_voltage_real",
             "type": "Recorder",
-            "parameters": {"feather_filename": "../../outputs/ieee123/voltage_real.feather",
-                           "csv_filename": "../../outputs/ieee123/voltage_real.csv"
+            "parameters": {"feather_filename": "../../outputs/large/voltage_real.feather",
+                           "csv_filename": "../../outputs/large/voltage_real.csv"
                           }
         },
         {
             "name": "recorder_voltage_imag",
             "type": "Recorder",
-            "parameters": {"feather_filename": "../../outputs/ieee123/voltage_imag.feather",
-                           "csv_filename": "../../outputs/ieee123/voltage_imag.csv"
+            "parameters": {"feather_filename": "../../outputs/large/voltage_imag.feather",
+                           "csv_filename": "../../outputs/large/voltage_imag.csv"
                           }
         },
         {
             "name": "recorder_voltage_mag",
             "type": "Recorder",
-            "parameters": {"feather_filename": "../../outputs/ieee123/voltage_mag.feather",
-                           "csv_filename": "../../outputs/ieee123/voltage_mag.csv"
+            "parameters": {"feather_filename": "../../outputs/large/voltage_mag.feather",
+                           "csv_filename": "../../outputs/large/voltage_mag.csv"
                           }
         },
         {
             "name": "recorder_voltage_angle",
             "type": "Recorder",
-            "parameters": {"feather_filename": "../../outputs/ieee123/voltage_angle.feather",
-                           "csv_filename": "../../outputs/ieee123/voltage_angle.csv"
+            "parameters": {"feather_filename": "../../outputs/large/voltage_angle.feather",
+                           "csv_filename": "../../outputs/large/voltage_angle.csv"
                           }
         },
         {
@@ -40,15 +40,14 @@
             "name": "local_feeder",
             "type": "Feeder",
             "parameters": {
-                "use_smartds": false,
-                "user_uploads_model": false,
-                "profile_location": "gadal_ieee123/profiles",
-                "opendss_location": "gadal_ieee123/qsts",
-                "sensor_location": "gadal_ieee123/sensors.json",
-                "start_date": "2017-01-01 00:00:00",
+                "use_smartds": true,
+                "profile_location": "SMART-DS/v1.0/2017/SFO/P9U/profiles",
+                "opendss_location": "SMART-DS/v1.0/2017/SFO/P9U/scenarios/solar_medium_batteries_none_timeseries/opendss/p9uhs16_1247/p9uhs16_1247--p9udt12866",
+                "start_date": "2017-05-01 00:00:00",
                 "number_of_timesteps": 96,
                 "run_freq_sec": 900,
-                "topology_output": "../../outputs/ieee123/topology.json"
+                "topology_output": "../../outputs/large/topology.json",
+                "use_sparse_admittance": true
             }
         },
         {
@@ -57,7 +56,7 @@
             "parameters": {
                 "gaussian_variance": 0.0,
                 "random_percent": 0.0,
-                "measurement_file": "../local_feeder/sensors/sensors.json"
+                "measurement_file": "../local_feeder/sensors/voltage_ids.json"
             }
         },
         {
@@ -66,7 +65,7 @@
             "parameters": {
                 "gaussian_variance": 0.0,
                 "random_percent": 0.0,
-                "measurement_file": "../local_feeder/sensors/sensors.json"
+                "measurement_file": "../local_feeder/sensors/real_ids.json"
             }
         },
         {
@@ -75,7 +74,7 @@
             "parameters": {
                 "gaussian_variance": 0.0,
                 "random_percent": 0.0,
-                "measurement_file": "../local_feeder/sensors/sensors.json"
+                "measurement_file": "../local_feeder/sensors/reactive_ids.json"
             }
         }
 
