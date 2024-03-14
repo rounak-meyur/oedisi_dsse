@@ -1,7 +1,7 @@
 build_*
 __pycache__
 *__pycache__*
-
+outputs
 
 json
 SuiteSparse
