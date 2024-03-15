@@ -5,7 +5,7 @@ Open Energy Data Initiative - Solar Systems Integration Data and Analytics (OEDI
 To simply run the DSSE algorithm for a specific scenario modify the build arg *SCENARIO* to one of the preconfigured settings: ieee123, small, medium or large. Outputs are saved in the outputs directory within a subdirectory named by the scenario name.
 
 ```shell
-bash build.sh
+bash build.sh ieee123
 ```
 
 ## Build and Run
