@@ -11,5 +11,5 @@ else
 	fi
 	docker build --build-arg SCENARIO=$scenario -t dsse-$scenario:1.1.0 . -f Dockerfile
     docker volume create --name oedisi_outputs --opt type=none --opt device=${PWD}/outputs/$scenario --opt o=bind
-    docker run --rm -it --mount source=oedisi_outputs,target=/home/outputs/$scenario dsse-$scenario:1.1.0
+    docker run --rm -it --mount source=oedisi_outputs,target=/home/outputs dsse-$scenario:1.1.0
 fi
