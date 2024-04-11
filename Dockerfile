@@ -47,7 +47,7 @@ RUN apt install -y liblapack-dev \
 # INSTALL State Estimator
 # ----------------------------------------------------
 RUN cd /build \
-    && git clone --depth 1 --branch OEDISI.1.1 https://github.com/GRIDAPPSD/gridappsd-state-estimator \
+    && git clone --depth 1 --branch oedisi_angle_meas https://github.com/GRIDAPPSD/gridappsd-state-estimator \
     && cd gridappsd-state-estimator \
     && git clone https://github.com/GRIDAPPSD/SuiteSparse \
     && git clone https://github.com/GRIDAPPSD/json \
