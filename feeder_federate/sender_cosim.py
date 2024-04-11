@@ -293,6 +293,9 @@ def go_cosim(sim: FeederSimulator, config: FeederConfig, input_mapping: Dict[str
     pub_voltages_magnitude = h.helicsFederateRegisterPublication(
         vfed, "voltages_magnitude", h.HELICS_DATA_TYPE_STRING, ""
     )
+    pub_voltages_angle = h.helicsFederateRegisterPublication(
+        vfed, "voltages_angle", h.HELICS_DATA_TYPE_STRING, ""
+    )
     pub_powers_real = h.helicsFederateRegisterPublication(
         vfed, "powers_real", h.HELICS_DATA_TYPE_STRING, ""
     )
@@ -388,9 +391,15 @@ def go_cosim(sim: FeederSimulator, config: FeederConfig, input_mapping: Dict[str
             f"{current_data.feeder_voltages.data[0]}"
         )
         voltage_magnitudes = np.abs(current_data.feeder_voltages)
+        voltage_angles = np.angle(current_data.feeder_voltages)
         pub_voltages_magnitude.publish(
             VoltagesMagnitude(
                 **xarray_to_dict(voltage_magnitudes), time=current_timestamp,
+            ).json()
+        )
+        pub_voltages_angle.publish(
+            VoltagesAngle(
+                **xarray_to_dict(voltage_angles), time=current_timestamp,
             ).json()
         )
         pub_voltages_real.publish(

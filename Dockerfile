@@ -53,7 +53,7 @@ RUN cd /build \
     && git clone https://github.com/GRIDAPPSD/json \
     && LD_LIBRARY_PATH=/build/gridappsd-state-estimator/SuiteSparse/lib/ make -C SuiteSparse LAPACK=-llapack BLAS=-lblas \
     && make -C state-estimator \
-    && rm -rf .git SuiteSparse/.git json/.git 
+    && rm -rf SuiteSparse/.git json/.git 
 
 
 
@@ -78,19 +78,9 @@ COPY README.md /home/README.md
 COPY requirements.txt /home/requirements.txt
 COPY scenario /home/scenario
 COPY outputs /home/outputs
+COPY run.sh /home/run.sh
 
 
 RUN pip install -r requirements.txt \
     && rm -rf /root/.cache/pip/wheels
 
-
-RUN for dir in scenario/*/; \
-    do \
-    SCENARIO=$(echo $dir | cut -f2 -d /); \
-    oedisi build \
-    --component-dict scenario/${SCENARIO}/components.json \
-    --system scenario/${SCENARIO}/system.json \
-    --target-directory build_${SCENARIO}; \
-    done
-
-# ENTRYPOINT ["oedisi", "run", "--runner", "build${SCENARIO}/system_runner.json"]
