@@ -42,7 +42,7 @@
             "parameters": {
                 "use_smartds": false,
                 "user_uploads_model": true,
-                "exisiting_feeder_file":"/home/123Bus/IEEE123Master.dss",
+                "existing_feeder_file":"/home/123Bus/IEEE123Master.dss",
                 "profile_location": "",
                 "opendss_location": "",
                 "start_date": "2017-01-01 00:00:00",
