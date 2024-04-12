@@ -391,7 +391,7 @@ def go_cosim(sim: FeederSimulator, config: FeederConfig, input_mapping: Dict[str
             f"{current_data.feeder_voltages.data[0]}"
         )
         voltage_magnitudes = np.abs(current_data.feeder_voltages)
-        voltage_angles = np.angle(current_data.feeder_voltages)
+        voltage_angles = np.arctan2(current_data.feeder_voltages.imag,current_data.feeder_voltages.real)
         pub_voltages_magnitude.publish(
             VoltagesMagnitude(
                 **xarray_to_dict(voltage_magnitudes), time=current_timestamp,
