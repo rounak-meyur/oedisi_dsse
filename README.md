@@ -5,12 +5,22 @@ Open Energy Data Initiative - Solar Systems Integration Data and Analytics (OEDI
 To simply run the DSSE algorithm for a specific scenario modify the build arg *SCENARIO* to one of the preconfigured settings: ieee123, small, medium or large. Outputs are saved in the outputs directory within a subdirectory named by the scenario name.
 
 ```shell
-bash build.sh ieee123
+bash run.sh ieee123
 ```
 
 ## Build and Run
-The DSSE is run as a C++ executable. The C++ code has been cloned from the [GridAppsD repository](#https://github.com/GRIDAPPSD/gridappsd-state-estimator/tree/OEDISI.1.1). To modify the C++ code, you can edit the source code in the /build/gridappsd-state-estimator/state-estimator/ directory and compile using
+Change Line 82 of `Dockerfile` to copy the directory with the OpenDSS files to the container.
 ```shell
-cd /build/gridappsd-state-estimator/
-make -C state-estimator
+COPY < path to local directory > /home/< name of directory >
+```
+Inside the `system.json` file, change the `existing_feeder_file` to point to the OpenDSS `Master.dss` file location. 
+
+Then build the Docker container using
+```shell
+docker build -t opendss-test:0.0.1 . -f Dockerfile
+```
+
+Once it is built, run the container
+```shell
+docker run -it --rm --entrypoint bash opendss-test:0.0.1
 ```
