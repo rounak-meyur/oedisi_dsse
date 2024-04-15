@@ -61,6 +61,15 @@
             }
         },
         {
+            "name": "sensor_voltage_angle",
+            "type": "MeasurementComponent",
+            "parameters": {
+                "gaussian_variance": 0.0,
+                "random_percent": 0.0,
+                "measurement_file": "../local_feeder/sensors/sensors.json"
+            }
+        },
+        {
             "name": "sensor_power_real",
             "type": "MeasurementComponent",
             "parameters": {
@@ -89,6 +98,12 @@
         },
         {
             "source": "local_feeder",
+            "source_port": "voltages_angle",
+            "target": "sensor_voltage_angle",
+            "target_port": "subscription"
+        },
+        {
+            "source": "local_feeder",
             "source_port": "powers_real",
             "target": "sensor_power_real",
             "target_port": "subscription"
@@ -110,6 +125,12 @@
             "source_port": "publication",
             "target": "pnnl_state_estimator",
             "target_port": "sensor_voltage_magnitude"
+        },
+        {
+            "source": "sensor_voltage_angle",
+            "source_port": "publication",
+            "target": "pnnl_state_estimator",
+            "target_port": "sensor_voltage_angle"
         },
         {
             "source": "sensor_power_real",
