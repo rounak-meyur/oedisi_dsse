@@ -78,6 +78,7 @@ COPY README.md /home/README.md
 COPY requirements.txt /home/requirements.txt
 COPY scenario /home/scenario
 COPY outputs /home/outputs
+COPY post_process /home/post_process
 COPY run.sh /home/run.sh
 COPY 123Bus /home/123Bus
 
