@@ -93,4 +93,3 @@ RUN for dir in scenario/*/; \
     --target-directory build_${SCENARIO}; \
     done
 
-WORKDIR /home/
