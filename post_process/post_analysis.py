@@ -94,4 +94,9 @@ if __name__ == "__main__":
     df_vmag_est = feather.read_feather(Vmagfile)
     df_vang_est = feather.read_feather(Vangfile)
 
-    compare_vmag(df_vmag_true, df_vmag_est, base_voltages, bus="35.1")
+    compare_vmag(
+        df_vmag_true, df_vmag_est, 
+        base_voltages, 
+        bus="35.1", 
+        to_file=f"outputs/{case}/test.png"
+        )
