@@ -74,10 +74,10 @@ COPY feeder_federate /home/feeder_federate
 COPY estimator_federate /home/estimator_federate
 COPY measuring_federate /home/measuring_federate
 COPY recorder_federate /home/recorder_federate
-COPY README.md /home/README.md
 COPY requirements.txt /home/requirements.txt
 COPY scenario /home/scenario
-COPY outputs /home/outputs
+RUN mkdir /home/outputs
+COPY run.sh /home/run.sh
 
 
 RUN pip install -r requirements.txt \
@@ -92,5 +92,3 @@ RUN for dir in scenario/*/; \
     --system scenario/${SCENARIO}/system.json \
     --target-directory build_${SCENARIO}; \
     done
-
-# ENTRYPOINT ["oedisi", "run", "--runner", "build${SCENARIO}/system_runner.json"]

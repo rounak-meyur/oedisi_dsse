@@ -1,7 +1,13 @@
+# Common tmp files generated
 build_*
 __pycache__
 *__pycache__*
 outputs
 
+# OpenDSS directories
+dss_base
+123Bus
+
+# installation directories
 json
 SuiteSparse

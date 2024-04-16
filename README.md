@@ -2,15 +2,15 @@
 Open Energy Data Initiative - Solar Systems Integration Data and Analytics (OEDI-SI) Distribution System State Estimation (DSSE)
 
 ## Docker
-To simply run the DSSE algorithm for a specific scenario modify the build arg *SCENARIO* to one of the preconfigured settings: ieee123, small, medium or large. Outputs are saved in the outputs directory within a subdirectory named by the scenario name.
-
+To build the container, use the following command. This will build the container `openenergydatainitiative/pnnl-dsse-ekf` with the tag `1.0.0`.
 ```shell
-bash build.sh ieee123
+docker build -t openenergydatainitiative/pnnl-dsse-ekf:1.0.0 . -f Dockerfile
 ```
-
-## Build and Run
-The DSSE is run as a C++ executable. The C++ code has been cloned from the [GridAppsD repository](#https://github.com/GRIDAPPSD/gridappsd-state-estimator/tree/OEDISI.1.1). To modify the C++ code, you can edit the source code in the /build/gridappsd-state-estimator/state-estimator/ directory and compile using
+To run the container, run the following command.
 ```shell
-cd /build/gridappsd-state-estimator/
-make -C state-estimator
+docker run -it --rm --entrypoint bash openenergydatainitiative/pnnl-dsse-ekf:1.0.0
+```
+Once inside the container, to simply run the DSSE algorithm for a specific scenario modify the argument `scenario` to one of the preconfigured settings: ieee123, small, medium or large. Outputs are saved in the outputs directory within a subdirectory named by the scenario name. Replace the `scenario` below to point to the desired scenario.
+```shell
+bash run.sh < scenario >
 ```
