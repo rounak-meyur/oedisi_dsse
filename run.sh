@@ -1,5 +1,6 @@
 #!/bin/bash
 scenario="$1"
+cd /home/
 
 if [ "$scenario" = "" ];
 then

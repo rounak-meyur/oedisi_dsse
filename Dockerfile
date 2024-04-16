@@ -92,3 +92,5 @@ RUN for dir in scenario/*/; \
     --system scenario/${SCENARIO}/system.json \
     --target-directory build_${SCENARIO}; \
     done
+
+WORKDIR /home/
