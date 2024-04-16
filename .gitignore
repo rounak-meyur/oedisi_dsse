@@ -4,6 +4,7 @@ __pycache__
 *__pycache__*
 outputs
 *.tar
+*.tar.gz
 
 # OpenDSS directories
 dss_base
