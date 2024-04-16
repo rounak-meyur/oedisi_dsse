@@ -14,3 +14,4 @@ Once inside the container, to simply run the DSSE algorithm for a specific scena
 ```shell
 bash run.sh < scenario >
 ```
+To run the `large` scenario, make sure that the memory limit of Docker container is increased to at least 24GB. This can be changed in Docker Desktop application. Go to Settings -> Resources -> Resource Allocation -> Memory limit and increase the slider to meet the minimum memory requirement of 24GB. 
