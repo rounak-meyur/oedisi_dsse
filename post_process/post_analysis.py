@@ -41,11 +41,43 @@ def get_base_voltages(topology_file):
         base_voltages = base_voltage_df["value"]
     return base_voltages
 
-def compare_vmag(df_true, df_est, bus, base_voltages):
+def compare_vmag(
+        df_true, df_est, base_voltages, bus, 
+        to_file = None, show=False, do_return=False,
+        **kwargs):
+    figsize = kwargs.get('figsize', (10, 10))
+    constrained_layout = kwargs.get('constrained_layout', False)
+    label_fontsize = kwargs.get('fontsize', 25)
+    legend_fontsize = label_fontsize + 2
+    ticklabel_fontsize = label_fontsize - 2
+    title_fontsize = label_fontsize + 10
+    suptitle_sfx = kwargs.get('suptitle_sfx',None)
+
     true_voltages = df_true[bus] / base_voltages[bus]
     est_voltages = df_est[bus] / base_voltages[bus]
 
-    return
+    fig, ax = plt.subplots(1, 1, figsize=figsize, constrained_layout=constrained_layout)
+    xaxis = np.arange(df_true.shape[0])
+    ax.plot(xaxis, true_voltages, color='red', marker='o', ls='dashed', lw=2.0, label="True")
+    ax.plot(xaxis, est_voltages, color='blue', marker='o', ls='dashed', lw=2.0, label="Estimated")
+    suptitle = f"Voltage magnitude comparison for bus {bus}"
+
+    ax.set_xlabel("Time", fontsize=label_fontsize)
+    ax.set_ylabel(f"Voltage Magnitudes (p.u.)", fontsize=label_fontsize)
+    ax.tick_params(axis="x", labelsize=ticklabel_fontsize)
+    ax.tick_params(axis="y", labelsize=ticklabel_fontsize)
+    ax.legend(fontsize=legend_fontsize, markerscale=2)
+    fig.suptitle(suptitle, fontsize=title_fontsize)
+
+    if to_file:
+        fig.savefig(to_file, bbox_inches='tight')
+    if show:
+        plt.show()
+    plt.close(fig)
+    
+    if do_return:
+        return fig
+    pass
 
 if __name__ == "__main__":
     case = sys.argv[1]
@@ -61,3 +93,5 @@ if __name__ == "__main__":
 
     df_vmag_est = feather.read_feather(Vmagfile)
     df_vang_est = feather.read_feather(Vangfile)
+
+    compare_vmag(df_vmag_true, df_vmag_est, base_voltages, bus="35.1")
