@@ -22,5 +22,5 @@ docker build -t opendss-test:0.0.1 . -f Dockerfile
 
 Once it is built, run the container
 ```shell
-docker run -it --rm --entrypoint bash opendss-test:0.0.1
+docker run -it --rm --entrypoint bash -w "/home/" opendss-test:0.0.1
 ```

@@ -57,9 +57,11 @@ def compare_vmag(
     est_voltages = df_est[bus] / base_voltages[bus]
 
     fig, ax = plt.subplots(1, 1, figsize=figsize, constrained_layout=constrained_layout)
-    xaxis = np.arange(df_true.shape[0])
-    ax.plot(xaxis, true_voltages, color='red', marker='o', ls='dashed', lw=2.0, label="True")
-    ax.plot(xaxis, est_voltages, color='blue', marker='o', ls='dashed', lw=2.0, label="Estimated")
+    xaxis = np.arange(df_est.shape[0])
+    y_true = [true_voltages.iloc[i] for i in xaxis]
+    y_est = [est_voltages.iloc[i] for i in xaxis]
+    ax.plot(xaxis, y_true, color='red', marker='o', ls='dashed', lw=2.0, label="True")
+    ax.plot(xaxis, y_est, color='blue', marker='o', ls='dashed', lw=2.0, label="Estimated")
     suptitle = f"Voltage magnitude comparison for bus {bus}"
 
     ax.set_xlabel("Time", fontsize=label_fontsize)
@@ -80,16 +82,16 @@ def compare_vmag(
     pass
 
 if __name__ == "__main__":
-    case = sys.argv[1]
-    realVfile = os.path.join(f"./outputs/{case}/voltage_real.feather")
-    imagVfile = os.path.join(f"./outputs/{case}/voltage_imag.feather")
-    Vmagfile = os.path.join(f"./outputs/{case}/voltage_mag.feather")
-    Vangfile = os.path.join(f"./outputs/{case}/voltage_angle.feather")
-    topofile = os.path.join(f"./outputs/{case}/topology.json")
+    case = "test"
+    realVfile = os.path.join(f"outputs/{case}/voltage_real.feather")
+    imagVfile = os.path.join(f"outputs/{case}/voltage_imag.feather")
+    Vmagfile = os.path.join(f"outputs/{case}/voltage_mag.feather")
+    Vangfile = os.path.join(f"outputs/{case}/voltage_angle.feather")
+    topofile = os.path.join(f"outputs/{case}/topology.json")
 
     base_voltages = get_base_voltages(topology_file=topofile)
     df_vmag_true = get_vmag_from_complex(realV=realVfile, imagV=imagVfile)
-    df_varg_true = get_varg_from_complex(realV=realVfile, imagV=imagVfile)
+    # df_varg_true = get_varg_from_complex(realV=realVfile, imagV=imagVfile)
 
     df_vmag_est = feather.read_feather(Vmagfile)
     df_vang_est = feather.read_feather(Vangfile)
@@ -97,6 +99,6 @@ if __name__ == "__main__":
     compare_vmag(
         df_vmag_true, df_vmag_est, 
         base_voltages, 
-        bus="35.1", 
-        to_file=f"outputs/{case}/test.png"
+        bus="30.3", 
+        to_file=f"outputs/{case}/test_known.png"
         )
