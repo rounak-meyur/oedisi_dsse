@@ -78,6 +78,7 @@ COPY requirements.txt /home/requirements.txt
 COPY scenario /home/scenario
 RUN mkdir /home/outputs
 COPY run.sh /home/run.sh
+COPY post_analysis.py /home/post_analysis.py
 
 
 RUN pip install -r requirements.txt \
