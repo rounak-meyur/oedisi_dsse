@@ -67,21 +67,30 @@ RUN apt install -y python3 \
         vim
 
 
-ARG SCENARIO
+
 
 WORKDIR /home/
 COPY feeder_federate /home/feeder_federate
 COPY estimator_federate /home/estimator_federate
 COPY measuring_federate /home/measuring_federate
 COPY recorder_federate /home/recorder_federate
-COPY README.md /home/README.md
 COPY requirements.txt /home/requirements.txt
-COPY scenario/${SCENARIO}/* /home/scenario/
+COPY scenario /home/scenario
+RUN mkdir /home/outputs
+COPY run.sh /home/run.sh
+COPY post_analysis.py /home/post_analysis.py
 
 
 RUN pip install -r requirements.txt \
     && rm -rf /root/.cache/pip/wheels
 
 
-RUN oedisi build --component-dict scenario/components.json --system scenario/system.json --target-directory build
-ENTRYPOINT ["oedisi", "run", "--runner", "build/system_runner.json"]
+RUN for dir in scenario/*/; \
+    do \
+    SCENARIO=$(echo $dir | cut -f2 -d /); \
+    oedisi build \
+    --component-dict scenario/${SCENARIO}/components.json \
+    --system scenario/${SCENARIO}/system.json \
+    --target-directory build_${SCENARIO}; \
+    done
+
