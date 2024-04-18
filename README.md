@@ -15,6 +15,7 @@ Once inside the container, to simply run the DSSE algorithm for a specific scena
 - small 
 - medium 
 - large (requires more than 24GB of memory)
+
 Outputs are saved inside the outputs directory within a subdirectory named by the scenario name. Replace the argument `scenario` below to execute state estimation for the desired scenario.
 ```shell
 bash run.sh < scenario >
@@ -36,6 +37,7 @@ docker run -it --rm --entrypoint bash -w "/home/" pnnl-dsse-ekf:custom
 ```
 Once inside the container, to simply run the DSSE algorithm for a specific scenario modify the argument `scenario` to one of the following preconfigured settings: 
 - custom
+
 Outputs are saved inside the outputs directory within a subdirectory named by the scenario name. Replace the argument `scenario` below to execute state estimation for the desired scenario.
 ```shell
 bash run.sh < scenario >

@@ -76,7 +76,7 @@ COPY requirements.txt /home/requirements.txt
 COPY scenario/custom /home/scenario/custom
 COPY post_analysis.py /home/post_analysis.py
 COPY run.sh /home/run.sh
-COPY base_dss /home/base_dss
+COPY custom /home/custom
 
 RUN mkdir /home/outputs
 

@@ -8,7 +8,7 @@ outputs
 *.tar.gz
 
 # OpenDSS directories
-base_dss
+custom
 123Bus
 
 # installation directories
