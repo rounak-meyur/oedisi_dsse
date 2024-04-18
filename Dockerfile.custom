@@ -73,7 +73,7 @@ COPY estimator_federate /home/estimator_federate
 COPY measuring_federate /home/measuring_federate
 COPY recorder_federate /home/recorder_federate
 COPY requirements.txt /home/requirements.txt
-COPY scenario /home/scenario
+COPY scenario/custom /home/scenario/custom
 COPY post_analysis.py /home/post_analysis.py
 COPY run.sh /home/run.sh
 COPY base_dss /home/base_dss
