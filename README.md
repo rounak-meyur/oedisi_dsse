@@ -23,9 +23,9 @@ bash run.sh < scenario >
 **NOTE**: To run the `large` scenario, make sure that the memory limit of Docker container is increased to at least 24GB. This can be changed in Docker Desktop application. Go to Settings -> Resources -> Resource Allocation -> Memory limit and increase the slider to meet the minimum memory requirement of 24GB. 
 
 ## DOCKER - Custom Scenario
-To build a container with a custom scenario, find the folder in the local system which contains the OpenDSS file for the custom scenario. Then, change **line 79** of `Dockerfile.custom` to copy the directory with the OpenDSS files to the container.
+To build a container with a custom scenario, find the folder in the local system which contains the OpenDSS file for the custom scenario. Then, change **line 79** of `Dockerfile.custom` to copy the directory with the OpenDSS files to the container home directory.
 ```shell
-COPY < path to local directory > /home/< name of directory >
+COPY < path to local directory > /home/custom
 ```
 Inside the `scenario/custom/system.json` file, change the configuration parameter `existing_feeder_file` on **line 44** to point to the OpenDSS `Master.dss` file location. Then build the Docker container using the following command. 
 ```shell
