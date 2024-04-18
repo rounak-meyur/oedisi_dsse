@@ -4,29 +4,29 @@
         {
             "name": "recorder_voltage_real",
             "type": "Recorder",
-            "parameters": {"feather_filename": "../../outputs/test/voltage_real.feather",
-                           "csv_filename": "../../outputs/test/voltage_real.csv"
+            "parameters": {"feather_filename": "../../outputs/hornrapids/voltage_real.feather",
+                           "csv_filename": "../../outputs/hornrapids/voltage_real.csv"
                           }
         },
         {
             "name": "recorder_voltage_imag",
             "type": "Recorder",
-            "parameters": {"feather_filename": "../../outputs/test/voltage_imag.feather",
-                           "csv_filename": "../../outputs/test/voltage_imag.csv"
+            "parameters": {"feather_filename": "../../outputs/hornrapids/voltage_imag.feather",
+                           "csv_filename": "../../outputs/hornrapids/voltage_imag.csv"
                           }
         },
         {
             "name": "recorder_voltage_mag",
             "type": "Recorder",
-            "parameters": {"feather_filename": "../../outputs/test/voltage_mag.feather",
-                           "csv_filename": "../../outputs/test/voltage_mag.csv"
+            "parameters": {"feather_filename": "../../outputs/hornrapids/voltage_mag.feather",
+                           "csv_filename": "../../outputs/hornrapids/voltage_mag.csv"
                           }
         },
         {
             "name": "recorder_voltage_angle",
             "type": "Recorder",
-            "parameters": {"feather_filename": "../../outputs/test/voltage_angle.feather",
-                           "csv_filename": "../../outputs/test/voltage_angle.csv"
+            "parameters": {"feather_filename": "../../outputs/hornrapids/voltage_angle.feather",
+                           "csv_filename": "../../outputs/hornrapids/voltage_angle.csv"
                           }
         },
         {
@@ -47,7 +47,7 @@
                 "start_date": "2017-01-01 00:00:00",
                 "number_of_timesteps": 96,
                 "run_freq_sec": 900,
-                "topology_output": "../../outputs/test/topology.json",
+                "topology_output": "../../outputs/hornrapids/topology.json",
                 "use_sparse_admittance": true
             }
         },
