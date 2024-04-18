@@ -2,12 +2,13 @@
 build_*
 __pycache__
 *__pycache__*
+.DS_Store
 outputs
 *.tar
 *.tar.gz
 
 # OpenDSS directories
-dss_base
+base_dss
 123Bus
 
 # installation directories

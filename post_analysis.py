@@ -99,6 +99,12 @@ if __name__ == "__main__":
     compare_vmag(
         df_vmag_true, df_vmag_est, 
         base_voltages, 
-        bus="30.3", 
+        bus="4643_22536.1", 
         to_file=f"outputs/{case}/test_known.png"
+        )
+    compare_vmag(
+        df_vmag_true, df_vmag_est, 
+        base_voltages, 
+        bus="4643_22536.3", 
+        to_file=f"outputs/{case}/test_unknown.png"
         )

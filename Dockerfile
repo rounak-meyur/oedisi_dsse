@@ -67,21 +67,19 @@ RUN apt install -y python3 \
         vim
 
 
-
-
+WORKDIR /home/
 COPY feeder_federate /home/feeder_federate
 COPY estimator_federate /home/estimator_federate
 COPY measuring_federate /home/measuring_federate
 COPY recorder_federate /home/recorder_federate
 COPY requirements.txt /home/requirements.txt
 COPY scenario /home/scenario
-COPY post_process /home/post_process
+COPY post_analysis.py /home/post_analysis.py
 COPY run.sh /home/run.sh
-COPY 123Bus /home/123Bus
+COPY base_dss /home/base_dss
 
 RUN mkdir /home/outputs
 
 RUN pip install -r requirements.txt \
     && rm -rf /root/.cache/pip/wheels
-
-WORKDIR /home/
+    
