@@ -1,3 +1,9 @@
+"""
+Description: Post analysis of state estimation results
+
+Author: Rounak Meyur
+"""
+
 import sys, os
 import matplotlib.pyplot as plt
 import matplotlib
