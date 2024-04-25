@@ -7,7 +7,7 @@ then
 else
     if [ ! -d "outputs/$scenario" ]; then
    		echo "Creating $scenario directory"
-   		mkdir "outputs/$scenario"
+   		mkdir -p "outputs/$scenario"
 	fi
 	docker build --build-arg SCENARIO=$scenario -t openenergydatainitiative/pnnl-dsse-ekf:$scenario . -f Dockerfile
     docker volume create --name oedisi_outputs --opt type=none --opt device=${PWD}/outputs/$scenario --opt o=bind

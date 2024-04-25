@@ -74,7 +74,7 @@ COPY measuring_federate /home/measuring_federate
 COPY recorder_federate /home/recorder_federate
 COPY requirements.txt /home/requirements.txt
 COPY scenario/custom /home/scenario
-COPY post_analysis.py /home/post_analysis.py
+
 COPY run.sh /home/run.sh
 COPY custom /home/custom
 
@@ -82,3 +82,11 @@ COPY custom /home/custom
 
 RUN pip install -r requirements.txt \
     && rm -rf /root/.cache/pip/wheels
+
+
+RUN oedisi build \
+    --component-dict scenario/components.json \
+    --system scenario/system.json \
+    --target-directory build
+
+ENTRYPOINT [ "oedisi", "run", "--runner", "build/system_runner.json" ]

@@ -31,18 +31,8 @@ To build a container with a custom scenario, find the folder in the local system
 ```shell
 COPY < path to local directory > /home/custom
 ```
-Inside the `scenario/custom/system.json` file, change the configuration parameter `existing_feeder_file` on **line 44** to point to the OpenDSS `Master.dss` file location. Then build the Docker container using the following command. 
+Inside the `scenario/custom/system.json` file, change the configuration parameter `existing_feeder_file` on **line 44** to point to the OpenDSS `Master.dss` file location. Then build and run the container using the `custom.sh`
 ```shell
-docker build -t pnnl-dsse-ekf:custom . -f Dockerfile.custom
+bash custom.sh
 ```
-This will build the container `pnnl-dsse-ekf` with the tag `custom`. To run the container, run the following command.
-```shell
-docker run -it --rm --entrypoint bash -w "/home/" pnnl-dsse-ekf:custom
-```
-Once inside the container, to simply run the DSSE algorithm for a specific scenario modify the argument `scenario` to one of the following preconfigured settings: 
-- custom
-
-Outputs are saved inside the outputs directory within a subdirectory named by the scenario name. Replace the argument `scenario` below to execute state estimation for the desired scenario.
-```shell
-bash run.sh
-```
+This will build the container `pnnl-dsse-ekf` with the the scenario name as the tag `custom`. Also, it will create an outputs directory to save the co-simulation outputs. Finally, it will run the container which automatically starts the co-simulation and saves outputs.
