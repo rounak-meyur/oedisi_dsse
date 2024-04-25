@@ -4,29 +4,29 @@
         {
             "name": "recorder_voltage_real",
             "type": "Recorder",
-            "parameters": {"feather_filename": "../../outputs/custom/voltage_real.feather",
-                           "csv_filename": "../../outputs/custom/voltage_real.csv"
+            "parameters": {"feather_filename": "../../outputs/voltage_real.feather",
+                           "csv_filename": "../../outputs/voltage_real.csv"
                           }
         },
         {
             "name": "recorder_voltage_imag",
             "type": "Recorder",
-            "parameters": {"feather_filename": "../../outputs/custom/voltage_imag.feather",
-                           "csv_filename": "../../outputs/custom/voltage_imag.csv"
+            "parameters": {"feather_filename": "../../outputs/voltage_imag.feather",
+                           "csv_filename": "../../outputs/voltage_imag.csv"
                           }
         },
         {
             "name": "recorder_voltage_mag",
             "type": "Recorder",
-            "parameters": {"feather_filename": "../../outputs/custom/voltage_mag.feather",
-                           "csv_filename": "../../outputs/custom/voltage_mag.csv"
+            "parameters": {"feather_filename": "../../outputs/voltage_mag.feather",
+                           "csv_filename": "../../outputs/voltage_mag.csv"
                           }
         },
         {
             "name": "recorder_voltage_angle",
             "type": "Recorder",
-            "parameters": {"feather_filename": "../../outputs/custom/voltage_angle.feather",
-                           "csv_filename": "../../outputs/custom/voltage_angle.csv"
+            "parameters": {"feather_filename": "../../outputs/voltage_angle.feather",
+                           "csv_filename": "../../outputs/voltage_angle.csv"
                           }
         },
         {
@@ -47,7 +47,7 @@
                 "start_date": "2017-01-01 00:00:00",
                 "number_of_timesteps": 96,
                 "run_freq_sec": 900,
-                "topology_output": "../../outputs/custom/topology.json",
+                "topology_output": "../../outputs/topology.json",
                 "use_sparse_admittance": true
             }
         },

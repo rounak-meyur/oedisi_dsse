@@ -44,5 +44,5 @@ Once inside the container, to simply run the DSSE algorithm for a specific scena
 
 Outputs are saved inside the outputs directory within a subdirectory named by the scenario name. Replace the argument `scenario` below to execute state estimation for the desired scenario.
 ```shell
-bash run.sh < scenario >
+bash run.sh
 ```
