@@ -163,7 +163,7 @@ def compare_vang(
     pass
 
 if __name__ == "__main__":
-    case = "custom"
+    case = sys.argv[1]
     realVfile = os.path.join(f"outputs/{case}/voltage_real.feather")
     imagVfile = os.path.join(f"outputs/{case}/voltage_imag.feather")
     Vmagfile = os.path.join(f"outputs/{case}/voltage_mag.feather")

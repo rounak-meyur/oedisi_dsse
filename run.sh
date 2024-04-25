@@ -1,7 +1,7 @@
 #!/bin/bash
-if [ ! -d "outputs" ]; then
+if [ ! -d "outputs/custom" ]; then
 	echo "Creating outputs directory"
-	mkdir outputs
+	mkdir -p outputs/custom
 fi
 pkill -9 helics_broker
 pkill -9 python
