@@ -10,6 +10,8 @@ outputs
 # OpenDSS directories
 custom
 123Bus
+test
+13Bus
 
 # installation directories
 json
