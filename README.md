@@ -8,7 +8,7 @@ To build a container with the IEEE 123 bus and the SMART-DS scenarios, use the f
 - medium 
 - large (requires more than 24GB of memory)
 ```shell
-bash build.sh < scenario >
+bash create.sh < scenario >
 ```
 This will build the container `openenergydatainitiative/pnnl-dsse-ekf` with the the scenario name as the tag `< scenario >`. Also, it will create an outputs directory to save the co-simulation outputs. Finally, it will run the container which automatically starts the co-simulation and saves outputs.
 
