@@ -65,7 +65,7 @@ docker run --rm -it --mount source=oedisi_outputs,target=/home/outputs openenerg
 ```
 
 ### [Smart-DS Large sized feeder](https://hub.docker.com/r/openenergydatainitiative/pnnl-dsse-ekf-sfo-p9u)
-Open Energy Data Initiative - Solar Systems Integration Data and Analytics (OEDI-SI) Distribution System State Estimation (DSSE) on the IEEE 123 bus test feeder.
+Open Energy Data Initiative - Solar Systems Integration Data and Analytics (OEDI-SI) Distribution System State Estimation (DSSE) on the large Smart-DS feeder.
 
 #### Load Container
 ```shell
