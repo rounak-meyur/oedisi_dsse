@@ -12,7 +12,7 @@ bash create.sh < scenario >
 ```
 This will build the container `openenergydatainitiative/pnnl-dsse-ekf` with the the scenario name as the tag `< scenario >`. Also, it will create an outputs directory to save the co-simulation outputs. Finally, it will run the container which automatically starts the co-simulation and saves outputs.
 
-## Load Container from OpenEDI
+## DOCKER - Load and Run Containers from OpenEDI
 The containers can be loaded directly from DockerHub for the four pre-defined scenarios as follows:
 - [ieee123](https://hub.docker.com/r/openenergydatainitiative/pnnl-dsse-ekf-ieee-123)
 - [small](https://hub.docker.com/r/openenergydatainitiative/pnnl-dsse-ekf-sfo-p1u)
