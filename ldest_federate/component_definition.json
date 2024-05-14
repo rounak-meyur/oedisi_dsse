@@ -1,0 +1,15 @@
+{
+    "directory": "ldest_federate",
+    "execute_function": "python opf_ldestimator.py",
+    "static_inputs": [],
+    "dynamic_inputs": [
+        {"type": "VoltagesMagnitude", "port_id": "voltages_magnitude"},
+        {"type": "PowersReal", "port_id": "powers_real"},
+        {"type": "PowersImaginary", "port_id": "powers_imaginary"},
+        {"type": "Topology", "port_id": "topology"}
+    ],
+    "dynamic_outputs": [
+        {"type": "PowersReal", "port_id": "pv_real"},
+        {"type": "PowersImaginary", "port_id": "pv_imag"}
+    ]
+}

@@ -391,15 +391,21 @@ class EstimatorFederate:
             H_check = Hmat[:len(vmag)]
             x_check = np.concatenate((self.V0.reshape(-1), P_inj, Q_inj, pPV_true, qPV_true))
             v_est = H_check @ x_check
+
+            # Node IDs in the network
+            nodes = voltages_mag.ids
             
 
             import matplotlib.pyplot as plt
-            fig,ax = plt.subplots(1,1,figsize=(15,8))
+            fig,ax = plt.subplots(1,1,figsize=(20,12))
             ax.plot(range(len(vmag)), vmag, 'b--', lw=2.0, label='true')
             ax.plot(range(len(v_est)), np.sqrt(v_est), color='crimson', ls='dashed', lw=2.0, label='estimated')
+            ax.set_xticks(list(range(len(vmag))), nodes, fontsize=15, rotation=30)
+            ax.tick_params(axis='y', labelsize=20)
             ax.set_ylabel("Voltage (in p.u.)", fontsize=20)
             ax.set_xlabel("Nodes in network", fontsize=20)
-            ax.legend(fontsize=20, markerscale=2)
+            ax.legend(fontsize=25, markerscale=2)
+            fig.suptitle("Linearized voltages obtained from Taylor Series Approx", fontsize=30)
             fig.savefig("check_voltage_estimate.png")
             
             # Perform pseudo-inverse of the H matrix to get states from the measurements
