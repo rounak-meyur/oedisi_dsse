@@ -229,7 +229,6 @@ class EstimatorFederate:
             # select rows corresponding to voltages and columns 
             # corresponsing to slack bus voltage and node injections
             v0 = vmag_pu[vslack]
-            logger.debug(v0)
             H_check = np.hstack((Hv,Hpq))
             z = np.hstack((np.identity(len(vslack)), np.zeros(shape=(len(vslack),Hpq.shape[1]))))
             for i in range(len(vslack)):

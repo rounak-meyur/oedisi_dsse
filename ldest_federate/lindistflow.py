@@ -1,4 +1,3 @@
-from enum import Enum
 import numpy as np
 import math
 import logging
@@ -10,6 +9,9 @@ logger.setLevel(logging.DEBUG)
 
 """
 Author: Rounak Meyur
+
+Description: Builds a matrix to relate the linear voltage magnitude estimates of all nodes to the 
+real and reactive power injections at the nodes.
 """
 
 
@@ -190,7 +192,7 @@ def get_Hmat(
                     )
                 # Phase C
                 A1 = power_balance_relation(
-                    A1, k_frm_B, k_to_B, 
+                    A1, k_frm_C, k_to_C, 
                     loc + nbranch_ABC * 2, 
                     val_bus['idx'] + nbus_ABC * 2
                     )
@@ -216,7 +218,7 @@ def get_Hmat(
                     )
                 # Phase C
                 A1 = power_balance_relation(
-                    A1, k_frm_B, k_to_B, 
+                    A1, k_frm_C, k_to_C, 
                     loc + nbranch_ABC * 5, 
                     val_bus['idx'] + nbus_ABC * 5
                     )
@@ -225,8 +227,6 @@ def get_Hmat(
 
     # Constraint 2: Voltage drop equation:
     # Vj = Vi - Zij Sij* - Sij Zij*
-
-
     A2 = np.zeros(shape = (n_branch, 2*n_branch))
     Av = np.zeros(shape = (n_branch, n_bus))
 
@@ -283,18 +283,55 @@ def get_Hmat(
             
         idx += 1
 
+    
+    ########################################################################################################################
+    # va,vb,vc are phase voltage vectors for non slack buses
+    # v0a, v0b, v0c are phase voltages for slack bus 
+    # fpa, fpb, fpc are real power flow vectors for each phase
+    # fqa, fqb, fqc are reactive power flow vectors for each phase
+    # pa, pb, pc are real power injections at non slack buses
+    # qa, qb, qc are reactive power injections at non slack buses
+    
+    # We write the vector expressions
+    # vn = [va.T, vb.T, vc.T]
+    # v0 = [v0a, v0b, v0c]
+    # v = [v0.T vn.T]
+    # fp = [fpa.T, fpb.T, fpc.T]
+    # fq = [fqa.T, fqb.T, fqc.T]
+    # f = [fp.T, fq.T]
+    # pn = [pa.T, pb.T, pc.T]
+    # qn = [qa.T, qb.T, qc.T]
+    # p = [pn.T, qn.T]
+
+    # The power balance equations are
+    # p_all = A1 @ f
+    # Remove rows of A1 corresponding to the slack nodes to get the square matrix H22 (for a radial system)
+    # p = H22 @ f
+    # f = H22_inv @ p
+
+    # The lindistflow equations are
+    # v_delta = A2 @ f
+    # where v_delta is the vector of voltage differences along the branches
+    # v_delta = Av @ v = [Av0 Avr] @ [v0.T vn.T] = (Av0 @ v0.T) + (Avr @ vn.T)
+    # A2 @ f = (Av0 @ v0) + (Avr @ vn)
+    # vn = -(Avr_inv @ Av0) @ v0 + (Avr_inv @ A2) @ f
+    
+    # Denote the following
+    # H11 = -(Avr_inv @ Av0)
+    # H12 = (Avr_inv @ A2)
+    ########################################################################################################################
     slack_node_idx = [slack_index, slack_index+nbus_ABC, slack_index+2*nbus_ABC]
     slack_node_idx_pq = slack_node_idx + [slack_index+n_bus, slack_index+n_bus+nbus_ABC, slack_index+n_bus+2*nbus_ABC]
     Av0 = Av[:,slack_node_idx]
     Avr = np.delete(Av, slack_node_idx, axis=1)
     Avr_inv = np.linalg.inv(Avr)
 
-    H21 = - (Avr_inv @ Av0)
-    H22 = (Avr_inv @ A2)
+    H11 = - (Avr_inv @ Av0)
+    H12 = (Avr_inv @ A2)
 
-    H32 = np.delete(A1, slack_node_idx_pq, axis=0)
-    H32_inv = np.linalg.inv(H32)
-    return H21, H22@H32_inv
+    H22 = np.delete(A1, slack_node_idx_pq, axis=0)
+    H22_inv = np.linalg.inv(H22)
+    return H11, H12@H22_inv
 
 
 def get_pq(
@@ -369,3 +406,153 @@ def get_nodes(bus_info:dict) -> list:
         nodes[idx + n_bus*1] = f"{keyb}.2"
         nodes[idx + n_bus*2] = f"{keyb}.3"
     return nodes
+
+
+
+if __name__ == "__main__":
+
+    
+
+    # Inputs from the feeder federate saved in dictionary and other OEDISI data types
+    bus_info = {
+        'N2': {
+            'idx': 0, 
+            'phases': ['1', '2', '3'], 
+            'kv': 7.199557856794634, 
+            'vmag': [7106.360895653739, 7139.477719183365, 7120.597377968156], 
+            's_rated': 0.0, 
+            'pv': [[0.0, 0.0], [0.0, 0.0], [0.0, 0.0]], 
+            'pq': [[-0.0, -0.0], [-0.0, -0.0], [-0.0, -0.0]], 
+            'eqid': 'N2'
+            }, 
+
+        'SOURCEBUS': {
+            'idx': 1, 
+            'phases': ['1', '2', '3'], 
+            'kv': 7.199557856794634, 
+            'vmag': [7199.353486521364, 7199.370243417042, 7199.360567670321], 
+            's_rated': 0.0, 
+            'pv': [[0.0, 0.0], [0.0, 0.0], [0.0, 0.0]], 
+            'pq': [[2053709.2562983471, 1433148.6131437998], [1928820.098544116, 1308759.6483972222], [1986555.1984555677, 1390105.7640618484]], 
+            'eqid': 'SOURCEBUS'
+            }, 
+
+        'N3': {
+            'idx': 2, 
+            'phases': ['1', '2', '3'], 
+            'kv': 2.4017771198288433, 
+            'vmag': [2247.3750297296033, 2268.389577854546, 2255.819609890638], 
+            's_rated': 0.0, 
+            'pv': [[0.0, 0.0], [0.0, 0.0], [0.0, 0.0]], 
+            'pq': [[-0.0, -0.0], [-0.0, -0.0], [-0.0, -0.0]], 
+            'eqid': 'N3'
+            }, 
+
+        'N4': {
+            'idx': 3, 
+            'phases': ['1', '2', '3'], 
+            'kv': 2.4017771198288433, 
+            'vmag': [1917.769330972959, 2060.9928349426377, 1980.8314278404248], 
+            's_rated': 0.0, 
+            'pv': [[0.0, 0.0], [0.0, 0.0], [0.0, 0.0]], 
+            'pq': [[-1799941.343138584, -871605.0855056401], [-1800124.9897248761, -871933.0649904874], [-1799889.7682501655, -871714.021517176]], 
+            'eqid': 'N4'
+            }
+        }
+    
+    branch_info = {
+        'N2_SOURCEBUS': {
+            'idx': 0, 
+            'type': 'LINE', 
+            'from': 0, 'to': 1, 
+            'fr_bus': 'N2', 'to_bus': 'SOURCEBUS', 
+            'phases': ['1', '2', '3'], 
+            'zprim': [
+                [[0.1733114243335522, 0.4083439729266439], [0.059068554341517476, 0.1900225938743636], [0.05813478498489997, 0.14580229440346207]], 
+                [[0.05906855434151743, 0.1900225938743635], [0.17674939336989512, 0.39702951340790393], [0.05984739444692716, 0.16046725905764]], 
+                [[0.05813478498489982, 0.1458022944034619], [0.059847394446926966, 0.16046725905763978], [0.174796719325521, 0.40342875923927407]]
+                ]
+            }, 
+        
+        'N3_N2': {
+            'idx': 1, 
+            'type': 'LINE', 
+            'from': 2, 'to': 0, 
+            'fr_bus': 'N3', 'to_bus': 'N2', 
+            'phases': ['1', '2', '3'], 
+            'zprim': [
+                [[0.0864586666666667, 0.5187520000000002], [-0.0, 0.0], [-0.0, 0.0]], 
+                [[-0.0, 0.0], [0.0864586666666667, 0.5187520000000002], [-0.0, 0.0]], 
+                [[-0.0, 0.0], [-0.0, 0.0], [0.0864586666666667, 0.5187520000000002]]
+                ]
+            }, 
+        
+        'N4_N3': {
+            'idx': 2, 
+            'type': 'LINE', 
+            'from': 3, 'to': 2, 
+            'fr_bus': 'N4', 'to_bus': 'N3', 
+            'phases': ['1', '2', '3'], 
+            'zprim': [
+                [[0.21663928041694003, 0.5104299661583045], [0.07383569292689657, 0.23752824234295394], [0.07266848123112463, 0.18225286800432733]], 
+                [[0.07383569292689661, 0.23752824234295405], [0.22093674171236846, 0.49628689175987967], [0.07480924305865859, 0.20058407382204974]], 
+                [[0.07266848123112463, 0.1822528680043271], [0.07480924305865855, 0.2005840738220496], [0.2184958991569009, 0.5042859490490924]]
+                ]
+            }
+        }
+
+    source_bus = "SOURCEBUS"
+
+    baseV = VoltagesMagnitude(
+        values = [7199.557856794634, 7199.557856794634, 7199.557856794634, 
+                7199.557856794634, 7199.557856794634, 7199.557856794634, 
+                2401.7771198288433, 2401.7771198288433, 2401.7771198288433, 
+                2401.7771198288433, 2401.7771198288433, 2401.7771198288433], 
+        ids= ['SOURCEBUS.1', 'SOURCEBUS.2', 'SOURCEBUS.3', 
+            'N2.1', 'N2.2', 'N2.3', 
+            'N3.1', 'N3.2', 'N3.3', 
+            'N4.1', 'N4.2', 'N4.3']
+    )
+
+
+    # Get the linear matrices
+    Hv, Hpq = get_Hmat(bus_info, branch_info, source_bus)
+    pq = get_pq(bus_info, source_bus, SBASE=100.0e6)
+    vmag, vslack = get_v(bus_info, source_bus)
+    
+    # compute per unit voltage magnitudes
+    vbase = get_vbase(bus_info, baseV)
+    vmag_pu = vmag / vbase
+    
+    # select rows corresponding to voltages and columns 
+    # corresponsing to slack bus voltage and node injections
+    v0 = vmag_pu[vslack]
+    H_check = np.hstack((Hv,Hpq))
+    z = np.hstack((np.identity(len(vslack)), np.zeros(shape=(len(vslack),Hpq.shape[1]))))
+    for i in range(len(vslack)):
+        H_check = np.insert(H_check, vslack[i], z[i,:], axis=0)
+    x_check = np.concatenate((v0, pq))
+    v_linear = H_check @ x_check
+
+
+    ######### Plot to visualize the results #################
+    import matplotlib.pyplot as plt
+    # get the node list to sort the outputs in plotting order
+    nodes = get_nodes(bus_info)
+    node_ids = baseV.ids
+    nodes_ord = [nodes.tolist().index(nd) for nd in node_ids]
+
+    v_true = vmag_pu[nodes_ord]
+    v_est = v_linear[nodes_ord]
+    
+    # Plot the linear estimate versus true value
+    fig,ax = plt.subplots(1,1,figsize=(20,12))
+    ax.plot(range(len(v_true)), v_true, 'b--', lw=2.0, label='true')
+    ax.plot(range(len(v_est)), np.sqrt(v_est), color='crimson', ls='dashed', lw=2.0, label='estimated')
+    ax.set_xticks(list(range(len(v_true))), nodes[nodes_ord], fontsize=15, rotation=30)
+    ax.tick_params(axis='y', labelsize=20)
+    ax.set_ylabel("Voltage (in p.u.)", fontsize=20)
+    ax.set_xlabel("Nodes in network", fontsize=20)
+    ax.legend(fontsize=25, markerscale=2)
+    fig.suptitle("Linearized voltages obtained from LinDistFlow", fontsize=30)
+    fig.savefig("check_voltage_estimate.png")
