@@ -10,6 +10,8 @@ logger.setLevel(logging.DEBUG)
 """
 Author: Rounak Meyur
 
+Adapted from code written by Shiva Poudel and Monish Mukherjee
+
 Description: Builds a matrix to relate the linear voltage magnitude estimates of all nodes to the 
 real and reactive power injections at the nodes.
 """
@@ -71,6 +73,9 @@ def get_Hmat(
     # System's base definition
     PRIMARY_V = 0.12
     SBASE = 100.0 # in MVA
+    # compute base impedance
+    basekV = bus_info[source_bus]['kv'] / np.sqrt(3)
+    baseZ = basekV ** 2 / SBASE
     
 
     # Find the ABC phase and s1s2 phase triplex line and bus numbers
@@ -234,9 +239,6 @@ def get_Hmat(
     idx = 0
     v_lim = []
     for k, val_br in branch_info.items():
-        # compute base impedance
-        basekV = bus_info[val_br['fr_bus']]['kv'] / np.sqrt(3)
-        baseZ = basekV ** 2 / SBASE
         # Not writing voltage constraints for transformers
         if val_br['type'] not in secondary_model:
             z = np.asarray(val_br['zprim'])
@@ -310,15 +312,15 @@ def get_Hmat(
     # f = H22_inv @ p
 
     # The lindistflow equations are
-    # v_delta = A2 @ f
+    # v_delta = -A2 @ f
     # where v_delta is the vector of voltage differences along the branches
-    # v_delta = Av @ v = [Av0 Avr] @ [v0.T vn.T] = (Av0 @ v0.T) + (Avr @ vn.T)
+    # v_delta = Av @ v = [Av0 Avr] @ [v0.T vn.T] = (Av0 @ v0) + (Avr @ vn)
     # A2 @ f = (Av0 @ v0) + (Avr @ vn)
-    # vn = -(Avr_inv @ Av0) @ v0 + (Avr_inv @ A2) @ f
+    # vn = -(Avr_inv @ Av0) @ v0 - (Avr_inv @ A2) @ f
     
     # Denote the following
     # H11 = -(Avr_inv @ Av0)
-    # H12 = (Avr_inv @ A2)
+    # H12 = -(Avr_inv @ A2)
     ########################################################################################################################
     slack_node_idx = [slack_index, slack_index+nbus_ABC, slack_index+2*nbus_ABC]
     slack_node_idx_pq = slack_node_idx + [slack_index+n_bus, slack_index+n_bus+nbus_ABC, slack_index+n_bus+2*nbus_ABC]
@@ -326,8 +328,9 @@ def get_Hmat(
     Avr = np.delete(Av, slack_node_idx, axis=1)
     Avr_inv = np.linalg.inv(Avr)
 
+    logger.debug(A2)
     H11 = - (Avr_inv @ Av0)
-    H12 = (Avr_inv @ A2)
+    H12 = - (Avr_inv @ A2)
 
     H22 = np.delete(A1, slack_node_idx_pq, axis=0)
     H22_inv = np.linalg.inv(H22)
