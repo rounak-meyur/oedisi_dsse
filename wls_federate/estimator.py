@@ -185,7 +185,7 @@ def get_H(E, R, X):
     zm2m2 = np.zeros(shape=(m2,m2))
     
     H1 = np.hstack((np.identity(s), zsm1, zsm2, zsm1, zsm2))
-    H2 = np.hstack((E, R, X, znm1, znm2))
+    H2 = np.hstack((E, -R, -X, znm1, znm2))
     H3 = np.hstack((zsm1.T, np.identity(m1), zm1m2, zm1m1, zm1m2))
     H4 = np.hstack((zsm2.T, zm2m1, np.identity(m2), zm2m1, zm2m2))
     H5 = np.hstack((zsm1.T, -np.identity(m1), zm1m2, np.identity(m1), zm1m2))

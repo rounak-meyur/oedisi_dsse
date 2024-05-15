@@ -328,7 +328,6 @@ def get_Hmat(
     Avr = np.delete(Av, slack_node_idx, axis=1)
     Avr_inv = np.linalg.inv(Avr)
 
-    logger.debug(A2)
     H11 = - (Avr_inv @ Av0)
     H12 = - (Avr_inv @ A2)
 
