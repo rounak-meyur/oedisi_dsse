@@ -532,20 +532,23 @@ if __name__ == "__main__":
     )
 
 
-    # Get the linear matrices
-    Hv, Hpq = get_Hmat(bus_info, branch_info, source_bus)
+    H, H_check = get_Hmat(bus_info, branch_info, source_bus)
     pq = get_pq(bus_info, source_bus, SBASE=100.0e6)
     vmag, vslack = get_v(bus_info, source_bus)
     
+
     # compute per unit voltage magnitudes
     vbase = get_vbase(bus_info, baseV)
     vmag_pu = vmag / vbase
+    # vtrue = np.delete(vmag_pu, vslack)
+    
+    
+    
     
     # select rows corresponding to voltages and columns 
     # corresponsing to slack bus voltage and node injections
     v0 = vmag_pu[vslack]
-    H_check = np.hstack((Hv,Hpq))
-    z = np.hstack((np.identity(len(vslack)), np.zeros(shape=(len(vslack),Hpq.shape[1]))))
+    z = np.hstack((np.identity(len(vslack)), np.zeros(shape=(len(vslack),pq.shape[0]))))
     for i in range(len(vslack)):
         H_check = np.insert(H_check, vslack[i], z[i,:], axis=0)
     x_check = np.concatenate((v0, pq))
@@ -562,10 +565,13 @@ if __name__ == "__main__":
     v_true = vmag_pu[nodes_ord]
     v_est = v_linear[nodes_ord]
     
-    # Plot the linear estimate versus true value
+    
     fig,ax = plt.subplots(1,1,figsize=(20,12))
-    ax.plot(range(len(v_true)), v_true, 'b--', lw=2.0, label='true')
-    ax.plot(range(len(v_est)), np.sqrt(v_est), color='crimson', ls='dashed', lw=2.0, label='estimated')
+    ax.plot(range(len(v_true)), v_true, 'b--', lw=2.0, 
+            marker = '*', markersize=20, label='true')
+    ax.plot(range(len(v_est)), np.sqrt(v_est), color='crimson', 
+            marker='*', markersize=20, 
+            ls='dashed', lw=2.0, label='estimated')
     ax.set_xticks(list(range(len(v_true))), nodes[nodes_ord], fontsize=15, rotation=30)
     ax.tick_params(axis='y', labelsize=20)
     ax.set_ylabel("Voltage (in p.u.)", fontsize=20)
