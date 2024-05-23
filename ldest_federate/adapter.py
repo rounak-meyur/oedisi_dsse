@@ -51,6 +51,7 @@ def init_bus() -> dict:
     bus["vmag"] = np.zeros((3,)).tolist()
     bus["pq"] = np.zeros((3, 2)).tolist()
     bus["pv"] = np.zeros((3, 2)).tolist()
+    bus["vpu"] = np.zeros((3,)).tolist()
     return bus
 
 
@@ -91,6 +92,7 @@ def extract_voltages(bus: dict, voltages: VoltagesMagnitude) -> dict:
 
         phase_num = int(phase) - 1
         bus[name]["vmag"][phase_num] = voltage
+        bus[name]["vpu"][phase_num] = voltage / (bus[name]['kv']*1000.0)
     return bus
 
 
@@ -192,14 +194,14 @@ def extract_info(topology: Topology) -> Tuple[dict, dict]:
     for fr_eq, to_eq, y in zip(from_equip, to_equip, admittance):
         [from_name, from_phase] = fr_eq.split('.')
         type = "LINE"
-        if from_name.find('OPEN') != -1:
-            [from_name, _] = from_name.split('_')
-            type = "SWITCH"
+        # if from_name.find('OPEN') != -1:
+        #     [from_name, _] = from_name.split('_')
+        #     type = "SWITCH"
 
         [to_name, to_phase] = to_eq.split('.')
-        if to_name.find('OPEN') != -1:
-            [to_name, _] = to_name.split('_')
-            type = "SWITCH"
+        # if to_name.find('OPEN') != -1:
+        #     [to_name, _] = to_name.split('_')
+        #     type = "SWITCH"
 
         if from_name == to_name:
             continue

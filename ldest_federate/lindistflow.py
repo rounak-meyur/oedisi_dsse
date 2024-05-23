@@ -73,9 +73,6 @@ def get_Hmat(
     # System's base definition
     PRIMARY_V = 0.12
     SBASE = 100.0 # in MVA
-    # compute base impedance
-    basekV = bus_info[source_bus]['kv'] / np.sqrt(3)
-    baseZ = basekV ** 2 / SBASE
     
 
     # Find the ABC phase and s1s2 phase triplex line and bus numbers
@@ -239,6 +236,10 @@ def get_Hmat(
     idx = 0
     v_lim = []
     for k, val_br in branch_info.items():
+        # compute base impedance
+        basekV = bus_info[val_br['to_bus']]['kv']
+        baseZ = (basekV ** 2) / SBASE
+        
         # Not writing voltage constraints for transformers
         if val_br['type'] not in secondary_model:
             z = np.asarray(val_br['zprim'])
@@ -330,10 +331,20 @@ def get_Hmat(
 
     H11 = - (Avr_inv @ Av0)
     H12 = - (Avr_inv @ A2)
+    H13 = np.zeros(shape=(H11.shape[0],H12.shape[1]))
 
     H22 = np.delete(A1, slack_node_idx_pq, axis=0)
+    H23 = np.identity(H22.shape[0])
+    H21 = np.zeros(shape=(H22.shape[0],H11.shape[1]))
+    
     H22_inv = np.linalg.inv(H22)
-    return H11, H12@H22_inv
+    H_linear = np.hstack((H11,H12@H22_inv))
+
+    # construct the H matrix
+    H1 = np.hstack((H11, H12, H13))
+    H2 = np.hstack((H21, -H22, H23))
+    H = np.vstack((H1,H2))
+    return H, H_linear
 
 
 def get_pq(
@@ -393,9 +404,9 @@ def get_vbase(
     
     for keyb, val_bus in bus_info.items():
         idx = val_bus["idx"]
-        v[idx + n_bus*0] = vals[ids.index(f"{keyb}.1")]
-        v[idx + n_bus*1] = vals[ids.index(f"{keyb}.2")]
-        v[idx + n_bus*2] = vals[ids.index(f"{keyb}.3")]
+        v[idx + n_bus*0] = vals[ids.index(f"{keyb}.1")] if f"{keyb}.1" in ids else float("NaN")
+        v[idx + n_bus*1] = vals[ids.index(f"{keyb}.2")] if f"{keyb}.2" in ids else float("NaN")
+        v[idx + n_bus*2] = vals[ids.index(f"{keyb}.3")] if f"{keyb}.3" in ids else float("NaN")
         
     return v
 
@@ -422,6 +433,7 @@ if __name__ == "__main__":
             'phases': ['1', '2', '3'], 
             'kv': 7.199557856794634, 
             'vmag': [7106.360895653739, 7139.477719183365, 7120.597377968156], 
+            'vpu': [0.9870552869666603, 0.991655131792795, 0.9890323837566921],
             's_rated': 0.0, 
             'pv': [[0.0, 0.0], [0.0, 0.0], [0.0, 0.0]], 
             'pq': [[-0.0, -0.0], [-0.0, -0.0], [-0.0, -0.0]], 
@@ -433,6 +445,7 @@ if __name__ == "__main__":
             'phases': ['1', '2', '3'], 
             'kv': 7.199557856794634, 
             'vmag': [7199.353486521364, 7199.370243417042, 7199.360567670321], 
+            'vpu': [0.999971613586772, 0.9999739411968653, 0.9999725967771476],
             's_rated': 0.0, 
             'pv': [[0.0, 0.0], [0.0, 0.0], [0.0, 0.0]], 
             'pq': [[2053709.2562983471, 1433148.6131437998], [1928820.098544116, 1308759.6483972222], [1986555.1984555677, 1390105.7640618484]], 
@@ -444,6 +457,7 @@ if __name__ == "__main__":
             'phases': ['1', '2', '3'], 
             'kv': 2.4017771198288433, 
             'vmag': [2247.3750297296033, 2268.389577854546, 2255.819609890638], 
+            'vpu': [0.9357136937672939, 0.9444634479185576, 0.9392286647169615],
             's_rated': 0.0, 
             'pv': [[0.0, 0.0], [0.0, 0.0], [0.0, 0.0]], 
             'pq': [[-0.0, -0.0], [-0.0, -0.0], [-0.0, -0.0]], 
@@ -455,6 +469,7 @@ if __name__ == "__main__":
             'phases': ['1', '2', '3'], 
             'kv': 2.4017771198288433, 
             'vmag': [1917.769330972959, 2060.9928349426377, 1980.8314278404248], 
+            'vpu': [0.7984808956706196, 0.8581130396352007, 0.8247328404307817],
             's_rated': 0.0, 
             'pv': [[0.0, 0.0], [0.0, 0.0], [0.0, 0.0]], 
             'pq': [[-1799941.343138584, -871605.0855056401], [-1800124.9897248761, -871933.0649904874], [-1799889.7682501655, -871714.021517176]], 

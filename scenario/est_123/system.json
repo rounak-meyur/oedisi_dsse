@@ -1,0 +1,55 @@
+{
+    "name": "estimate_PV",
+    "components": [
+        {
+            "name": "lindist_estimator",
+            "type": "LinDistEstimator",
+            "parameters": {
+                "algorithm_parameters": {"tol": 1e-5}
+            }
+        },
+        {
+            "name": "local_feeder",
+            "type": "Feeder",
+            "parameters": {
+                "user_uploads_model": false,
+                "use_smartds": false,
+                "profile_location": "gadal_ieee123/profiles",
+                "opendss_location": "gadal_ieee123/qsts",
+                "sensor_location": "gadal_ieee123/sensors.json",
+                "start_date": "2017-01-01 00:00:00",
+                "number_of_timesteps": 1,
+                "run_freq_sec": 900,
+                "topology_output": "../../outputs/est_123/topology.json",
+                "use_sparse_admittance": true
+            }
+        }
+
+    ],
+    "links": [
+        {
+            "source": "local_feeder",
+            "source_port": "topology",
+            "target": "lindist_estimator",
+            "target_port": "topology"
+        },
+        {
+            "source": "local_feeder",
+            "source_port": "voltages_magnitude",
+            "target": "lindist_estimator",
+            "target_port": "voltages_magnitude"
+        },
+        {
+            "source": "local_feeder",
+            "source_port": "powers_real",
+            "target": "lindist_estimator",
+            "target_port": "powers_real"
+        },
+        {
+            "source": "local_feeder",
+            "source_port": "powers_imag",
+            "target": "lindist_estimator",
+            "target_port": "powers_imaginary"
+        }
+    ]
+}

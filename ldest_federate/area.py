@@ -71,6 +71,7 @@ def area_info(branch_info: dict, bus_info: dict, source_bus: str):
                 bus_info_area_i[key]['phases'] = bus_info[key]['phases']
                 bus_info_area_i[key]['kv'] = bus_info[key]['kv']
                 bus_info_area_i[key]['vmag'] = bus_info[key]['vmag']
+                bus_info_area_i[key]['vpu'] = bus_info[key]['vpu']
                 bus_info_area_i[key]['s_rated'] = (
                     bus_info[key]['pv'][0][0] + bus_info[key]['pv'][1][0] + bus_info[key]['pv'][2][0])
                 bus_info_area_i[key]['pv'] = [
@@ -96,6 +97,7 @@ def area_info(branch_info: dict, bus_info: dict, source_bus: str):
                 bus_info_area_i[key]['phases'] = bus_info[key]['phases']
                 bus_info_area_i[key]['kv'] = bus_info[key]['kv']
                 bus_info_area_i[key]['vmag'] = bus_info[key]['vmag']
+                bus_info_area_i[key]['vpu'] = bus_info[key]['vpu']
                 bus_info_area_i[key]['pv'] = [
                     i * mult_sec_pv for i in bus_info[key]['pv']]
                 bus_info_area_i[key]['pq'] = [
