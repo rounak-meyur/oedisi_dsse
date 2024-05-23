@@ -305,6 +305,12 @@ def get_Hmat(
     # pn = [pa.T, pb.T, pc.T]
     # qn = [qa.T, qb.T, qc.T]
     # p = [pn.T, qn.T]
+    # pn_load = [pa_load.T, pb_load.T, pc_load.T]
+    # qn_load = [qa_load.T, qb_load.T, qc_load.T]
+    # p_load = [pn_load.T, qn_load.T]
+    # pn_PV = [pa_PV.T, pb_PV.T, pc_PV.T]
+    # qn_PV = [qa_PV.T, qb_PV.T, qc_PV.T]
+    # p_PV = [pn_PV.T, qn_PV.T]
 
     # The power balance equations are
     # p_all = A1 @ f
@@ -317,11 +323,17 @@ def get_Hmat(
     # where v_delta is the vector of voltage differences along the branches
     # v_delta = Av @ v = [Av0 Avr] @ [v0.T vn.T] = (Av0 @ v0) + (Avr @ vn)
     # A2 @ f = (Av0 @ v0) + (Avr @ vn)
-    # vn = -(Avr_inv @ Av0) @ v0 - (Avr_inv @ A2) @ f
+    # vn = - (Avr_inv @ Av0) @ v0 - (Avr_inv @ A2) @ f + 0 @ p_PV
     
     # Denote the following
     # H11 = -(Avr_inv @ Av0)
     # H12 = -(Avr_inv @ A2)
+    # H13 = 0
+
+    # The loads are related to flows and PV generation as
+    # p_load = p_PV - p
+    # p_load = p_PV - H22 @ f
+    # p_load = (0 @ v0) - (H22 @ f) + (I @ p_PV)
     ########################################################################################################################
     slack_node_idx = [slack_index, slack_index+nbus_ABC, slack_index+2*nbus_ABC]
     slack_node_idx_pq = slack_node_idx + [slack_index+n_bus, slack_index+n_bus+nbus_ABC, slack_index+n_bus+2*nbus_ABC]
