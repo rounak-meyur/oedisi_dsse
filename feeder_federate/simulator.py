@@ -29,7 +29,7 @@ from dss_functions import (
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.StreamHandler())
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 
 def permutation(from_list, to_list):
@@ -137,7 +137,10 @@ class FeederSimulator(object):
         self.load_feeder()
 
         if self._sensor_location is None:
-            self.create_measurement_lists()
+            self.create_measurement_lists(
+                percent_real=100, 
+                percent_voltage=100
+                )
 
         self.snapshot_run()
         assert self._state == OpenDSSState.SNAPSHOT_RUN, f"{self._state}"
@@ -248,7 +251,7 @@ class FeederSimulator(object):
         random.seed(reactive_seed)
         reactive_subset = random.sample(
             self._AllNodeNames,
-            math.floor(len(self._AllNodeNames) * float(percent_voltage) / 100),
+            math.floor(len(self._AllNodeNames) * float(percent_real) / 100),
         )
         with open(os.path.join("sensors", "reactive_ids.json"), "w") as fp:
             json.dump(reactive_subset, fp, indent=4)

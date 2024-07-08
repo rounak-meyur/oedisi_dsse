@@ -1,5 +1,0 @@
-{
-	"Feeder":"feeder_federate/component_definition.json",
-	"Estimator":"wls_federate/component_definition.json",
-	"LinDistEstimator":"ldest_federate/component_definition.json"
-}

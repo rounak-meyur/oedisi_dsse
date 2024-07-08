@@ -10,6 +10,8 @@
     ],
     "dynamic_outputs": [
         {"type": "PowersReal", "port_id": "pv_real"},
-        {"type": "PowersImaginary", "port_id": "pv_imag"}
+        {"type": "PowersImaginary", "port_id": "pv_imag"},
+        {"type": "PowersReal", "port_id": "pv_real_actual"},
+        {"type": "PowersImaginary", "port_id": "pv_imag_actual"}
     ]
 }

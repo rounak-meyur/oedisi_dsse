@@ -9,7 +9,9 @@
         {"type": "Topology", "port_id": "topology"}
     ],
     "dynamic_outputs": [
-        {"type": "PowersReal", "port_id": "pv_real"},
-        {"type": "PowersImaginary", "port_id": "pv_imag"}
+        {"type": "MeasurementArray", "port_id": "pv_real_actual"},
+        {"type": "MeasurementArray", "port_id": "pv_imag_actual"},
+        {"type": "MeasurementArray", "port_id": "pv_real_estimated"},
+        {"type": "MeasurementArray", "port_id": "pv_imag_estimated"}
     ]
 }

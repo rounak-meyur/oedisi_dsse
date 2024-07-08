@@ -38,11 +38,30 @@ import xarray as xr
 
 import adapter
 from area import area_info
-from lindistflow import get_Hmat, get_pq, get_v, get_vbase, get_nodes
+from pv_detect_dsse import (
+    get_Hmat, 
+    get_pq, get_pq_forecast, get_pv,
+    get_v, get_vbase, get_nodes
+)
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.DEBUG)
+
+def add_noise(array, mean=0, std=0.1):
+  """Adds random noise to an array.
+
+  Args:
+    array: The array to add noise to.
+    mean: The mean of the noise.
+    std: The standard deviation of the noise.
+
+  Returns:
+    The array with noise added.
+  """
+
+  noise = np.random.normal(mean, std, size=array.shape)
+  return array + noise
 
 
 class UnitSystem(str, Enum):
@@ -64,6 +83,15 @@ class EstimatorParameters(BaseModel):
     base_power: Optional[float] = 100.0
 
 
+class Sensors(float):
+    SBASE = 1e6
+    ### add noises:
+    Vmeas_sigma = 0.05e-5  # 5% * nominal values 1-2% (make it general based on Sbase/Vbase
+    forecast_sigma = 0.005e-5  # 5-10% error (based on forecast uncertainty)
+    Pmeas_sigma = 0.003e-5 # 0.1-0.5% error as the customers are billed (>= 15 min interval)
+    Qmeas_sigma = 0.01e-5 # 1% of nominal KVA error probably?
+
+
 def eqarray_to_xarray(eq: EquipmentNodeArray):
     return xr.DataArray(
         eq.values,
@@ -81,12 +109,17 @@ def measurement_to_xarray(eq: MeasurementArray):
         coords={"ids": eq.ids}
     )
 
+def xarray_to_dict(data):
+    """Convert xarray to dict with values and ids for JSON serialization."""
+    coords = {key: list(data.coords[key].data) for key in data.coords.keys()}
+    return {"values": list(data.data), **coords}
 
 def matrix_to_numpy(admittance: List[List[Complex]]):
     "Convert list of list of our Complex type into a numpy matrix"
     return np.array([[x[0] + 1j * x[1] for x in row] for row in admittance])
 
-
+def sub_to_dict(sub):
+    return {k:v for (k,v) in zip(sub.ids,sub.values)}
 
 class EstimatorFederate:
     "Estimator federate. Wraps PV generation estimation with pubs and subs"
@@ -125,14 +158,20 @@ class EstimatorFederate:
         )
 
         # Register the publications
-        self.pub_power_real = self.vfed.register_publication(
+        self.pub_pv_real = self.vfed.register_publication(
             "pv_real", h.HELICS_DATA_TYPE_STRING, ""
         )
-        self.pub_power_imag = self.vfed.register_publication(
+        self.pub_pv_imag = self.vfed.register_publication(
             "pv_imag", h.HELICS_DATA_TYPE_STRING, ""
         )
-        logger.debug("algorithm_parameters")
-        logger.debug(algorithm_parameters)
+        self.pub_pv_real_actual = self.vfed.register_publication(
+            "pv_real_actual", h.HELICS_DATA_TYPE_STRING, ""
+        )
+        self.pub_pv_imag_actual = self.vfed.register_publication(
+            "pv_imag_actual", h.HELICS_DATA_TYPE_STRING, ""
+        )
+        # logger.debug("algorithm_parameters")
+        # logger.debug(algorithm_parameters)
 
     def run(self):
         "Enter execution and exchange data"
@@ -148,45 +187,33 @@ class EstimatorFederate:
         logger.info("Topology has been read")
         
         # Read the bus and branches
+        SBASE = Sensors.SBASE
         [branch, bus] = adapter.extract_info(topology)
         slack = topology.slack_bus[0]
         [source_bus, phase] = slack.split('.')
         branch_info, area_bus = area_info(
                         branch, bus, source_bus)
-        bus_info = adapter.extract_injection(area_bus, topology.injections)
+        bus_info = adapter.extract_injection(
+            area_bus, topology.injections)
         
-
-        # # Get the PV system ratings from the injections field of topology data
-        # ratings = eqarray_to_xarray(
-        #     topology.injections.power_real
-        # ) + 1j * eqarray_to_xarray(topology.injections.power_imaginary)
-        # pv_ratings = ratings[ratings.equipment_ids.str.startswith("PVSystem")]
-
-        # # Get the load ratings from the injections field of topology data
-        # load_ratings = ratings[ratings.equipment_ids.str.startswith("Load")]
-        # bus_to_index = {v: i for i, v in enumerate(topology.base_voltage_magnitudes.ids)}
-        # p_load = np.zeros(shape=(len(ids),))
-        # q_load = np.zeros(shape=(len(ids),))
-        # for i,v in enumerate(load_ratings.ids.data):
-        #     p_load[bus_to_index[v]] = -load_ratings.values[i].real
-        #     q_load[bus_to_index[v]] = -load_ratings.values[i].imag
+        # with open("bus_info.json", 'w') as f:
+        #     json.dump(bus_info, f)
+        # with open("branch_info.json", 'w') as f:
+        #     json.dump(branch_info, f)
         
+        baseV = sub_to_dict(topology.base_voltage_magnitudes)
+        with open("base_voltages.json", 'w') as f:
+            json.dump(baseV, f)
 
-        # p_pv = np.zeros(shape=(len(ids),))
-        # q_pv = np.zeros(shape=(len(ids),))
-        # for i,v in enumerate(pv_ratings.ids.data):
-        #     p_pv[bus_to_index[v]] = pv_ratings.values[i].real
-        #     q_pv[bus_to_index[v]] = pv_ratings.values[i].imag
-
-        # v = measurement_to_xarray(topology.base_voltage_magnitudes)
+        pq_load = get_pq_forecast(bus_info, source_bus, SBASE=SBASE)
+        pq_forecast = add_noise(pq_load, mean=0, std=Sensors.forecast_sigma)
 
         voltages_mag = None
         power_P = None
         power_Q = None
         while granted_time < h.HELICS_TIME_MAXTIME:
             
-            logger.debug("granted_time")
-            logger.debug(granted_time)
+            logger.info(f"granted_time: {granted_time}")
             
             # Keep granting time until all inputs arrive
             if not self.sub_voltages_mag.is_updated():
@@ -198,73 +225,110 @@ class EstimatorFederate:
             
             # Get input voltages data
             voltages_mag = VoltagesMagnitude.parse_obj(self.sub_voltages_mag.json)
-            assert topology.base_voltage_magnitudes.ids == voltages_mag.ids
+            current_time = voltages_mag.time
+            logger.info(current_time)
             bus_info = adapter.extract_voltages(bus_info, voltages_mag)
             
             # Get real and reactive power injections
             power_P = PowersReal.parse_obj(self.sub_power_P.json)
             power_Q = PowersImaginary.parse_obj(self.sub_power_Q.json)
-            assert topology.base_voltage_magnitudes.ids == power_P.ids
-            assert topology.base_voltage_magnitudes.ids == power_Q.ids
             bus_info = adapter.extract_powers(bus_info, power_P, power_Q)
+
+            # save the measurements as JSON files
+            # vmag_info = sub_to_dict(voltages_mag)
+            # pinj_info = sub_to_dict(power_P)
+            # qinj_info = sub_to_dict(power_Q)
+            # with open("vmag.json", 'w') as f:
+            #     json.dump(vmag_info, f)
+            # with open("pinj.json", 'w') as f:
+            #     json.dump(pinj_info, f)
+            # with open("qinj.json", 'w') as f:
+            #     json.dump(qinj_info, f)
             
-            
-            H, H_check = get_Hmat(bus_info, branch_info, source_bus)
-            pq = get_pq(bus_info, source_bus, SBASE=100.0e6)
+            H = get_Hmat(bus_info, branch_info, source_bus, SBASE=SBASE)
+            pq = get_pq(bus_info, source_bus, SBASE=SBASE)
             vmag, vslack = get_v(bus_info, source_bus)
             
 
             # compute per unit voltage magnitudes
             vbase = get_vbase(bus_info, topology.base_voltage_magnitudes)
             vmag_pu = vmag / vbase
-            # vtrue = np.delete(vmag_pu, vslack)
+            nodes = [n for k,n in enumerate(get_nodes(bus_info)) if k not in vslack]
+            logger.debug(f"Actual slack bus : {vmag_pu[vslack]}")
             
-            nodes = get_nodes(bus_info)
-            node_ids = voltages_mag.ids
-            nodes_ord = [nodes.tolist().index(nd) for nd in node_ids]
-            
-
+            ############################ estimation #############################
             ts = time.time()
-            
-            # select rows corresponding to voltages and columns 
-            # corresponsing to slack bus voltage and node injections
-            v0 = vmag_pu[vslack]
-            z = np.hstack((np.identity(len(vslack)), np.zeros(shape=(len(vslack),pq.shape[0]))))
-            for i in range(len(vslack)):
-                H_check = np.insert(H_check, vslack[i], z[i,:], axis=0)
-            x_check = np.concatenate((v0, pq))
-            v_linear = H_check @ x_check
 
-            # Get the order of nodes correct
-            v_true = vmag_pu[nodes_ord]
-            v_est = v_linear[nodes_ord]
+            V_W = np.array([1/(Sensors.Vmeas_sigma**2)]*len(vmag_pu))
+            Pl_W = np.array([1 / (Sensors.forecast_sigma ** 2)] * len(pq_load))
+            Pinj_W = np.array([1 / (Sensors.Pmeas_sigma ** 2)] * int(len(pq) / 2) )
+            Qinj_W = np.array([1 / (Sensors.Qmeas_sigma ** 2)] * int(len(pq) / 2) )
             
-            import matplotlib.pyplot as plt
-            fig,ax = plt.subplots(1,1,figsize=(20,12))
-            ax.plot(range(len(v_true)), v_true, 'b--', lw=2.0, 
-                    marker = '*', markersize=20, label='true')
-            ax.plot(range(len(v_est)), np.sqrt(v_est), color='crimson', 
-                    marker='*', markersize=20, 
-                    ls='dashed', lw=2.0, label='estimated')
-            ax.set_xticks(list(range(len(v_true))), nodes[nodes_ord], fontsize=15, rotation=30)
-            ax.tick_params(axis='y', labelsize=20)
-            ax.set_ylabel("Voltage (in p.u.)", fontsize=20)
-            ax.set_xlabel("Nodes in network", fontsize=20)
-            ax.legend(fontsize=25, markerscale=2)
-            fig.suptitle("Linearized voltages obtained from LinDistFlow", fontsize=30)
-            fig.savefig("check_voltage_estimate.png")
+
+            # increase weight of substation bus measurement
+            V_W[vslack] = 1e7*V_W[vslack]
+            # logger.debug(V_W)
+            
+            # combine the weights
+            W_array = np.hstack((V_W, Pl_W, Pinj_W, Qinj_W))
+            W = np.diag(W_array)
+
+            # perform estimation
+            Z_meas = np.hstack((np.square(vmag_pu), pq_forecast, pq))
+            G = H.T @ W @ H
+            G_inv = np.linalg.inv(G)
+            x_est = G_inv @ H.T @ W @ Z_meas
 
             te = time.time()
-            logger.debug(f"Estimator takes {(te-ts)} seconds")
+            #####################################################################
 
-            logger.info("end time: " + str(datetime.now()))
+            #### Residual computation
+            logger.debug(f"Slack bus estimates : {x_est[:len(vslack)]}")
+            z_est = H @ x_est
 
-            # There should be a HELICS way to do this? Set resolution?
-            previous_time = granted_time
-            while (
-                granted_time <= np.floor(previous_time) + 1
-            ):  # This should avoid waiting a full 15 minutes
-                granted_time = h.helicsFederateRequestTime(self.vfed, 1000)
+            actual_pv = get_pv(bus_info, source_bus, SBASE=SBASE)
+            Ppv_act = actual_pv[:int(len(pq)/2)]
+            Qpv_act = actual_pv[int(len(pq)/2):]
+            
+            Ppv_est = x_est[len(vslack) + len(pq): len(vslack) + len(pq) +int(len(pq_load)/2) ]
+            Qpv_est = x_est[len(vslack) + len(pq) +int(len(pq_load)/2): ]
+            
+            estimated_realPV_nodes = xr.DataArray(Ppv_est, coords={"ids":nodes})
+            estimated_reactivePV_nodes = xr.DataArray(Qpv_est, coords={"ids":nodes})
+            actual_realPV_nodes = xr.DataArray(Ppv_act, coords={"ids":nodes})
+            actual_reactivePV_nodes = xr.DataArray(Qpv_act, coords={"ids":nodes})
+
+            self.pub_pv_real.publish(
+                MeasurementArray(
+                    **xarray_to_dict(estimated_realPV_nodes),
+                    time=current_time, 
+                    units="pu"
+                ).json()
+            )
+            self.pub_pv_imag.publish(
+                MeasurementArray(
+                    **xarray_to_dict(estimated_reactivePV_nodes),
+                    time=current_time, 
+                    units="pu"
+                ).json()
+            )
+            self.pub_pv_real_actual.publish(
+                MeasurementArray(
+                    **xarray_to_dict(actual_realPV_nodes),
+                    time=current_time, 
+                    units="pu"
+                ).json()
+            )
+            self.pub_pv_imag_actual.publish(
+                MeasurementArray(
+                    **xarray_to_dict(actual_reactivePV_nodes),
+                    time=current_time, 
+                    units="pu"
+                ).json()
+            )
+            
+
+            logger.info(f"Estimator takes {(te-ts)} seconds")
 
         self.destroy()
 

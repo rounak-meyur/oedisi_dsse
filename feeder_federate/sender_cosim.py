@@ -180,9 +180,9 @@ def get_initial_data(sim: FeederSimulator, config: FeederConfig):
 
     feeder_voltages = sim.get_voltages_actual()
     feeder_angles: npt.NDArray[np.float64] = np.angle(feeder_voltages.data)
-    phases = list(map(get_true_phases, feeder_angles))
+    # phases = list(map(get_true_phases, feeder_angles))
     base_voltageangle = VoltagesAngle(
-        values=phases, ids=list(feeder_voltages.ids.data))
+        values=list(feeder_angles), ids=list(feeder_voltages.ids.data))
 
     topology = Topology(
         admittance=admittancematrix,
