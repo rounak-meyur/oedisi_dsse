@@ -1,0 +1,6 @@
+{
+	"Feeder":"feeder_federate/component_definition.json",
+	"LinDistEstimator":"ldest_federate/component_definition.json",
+	"MeasurementComponent":"measuring_federate/component_definition.json",
+	"Recorder":"recorder_federate/component_definition.json"
+}
