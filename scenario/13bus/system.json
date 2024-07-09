@@ -1,0 +1,151 @@
+{
+    "name": "estimate_PV",
+    "components": [
+        {
+            "name": "lindist_estimator",
+            "type": "LinDistEstimator",
+            "parameters": {
+                "algorithm_parameters": {"tol": 1e-5}
+            }
+        },
+        {
+            "name": "local_feeder",
+            "type": "Feeder",
+            "parameters": {
+                "use_smartds": false,
+                "existing_feeder_file":"../../../OpenDSS/Distrib/IEEETestCases/13Bus/IEEE13Nodeckt.dss",
+                "profile_location": "",
+                "opendss_location": "",
+                "start_date": "2017-01-01 00:00:00",
+                "number_of_timesteps": 96,
+                "run_freq_sec": 900,
+                "topology_output": "../../outputs/13bus/topology.json",
+                "use_sparse_admittance": true
+            }
+        },
+        {
+            "name": "sensor_voltage_magnitude",
+            "type": "MeasurementComponent",
+            "parameters": {
+                "gaussian_variance": 0.000,
+                "random_percent": 0.0,
+                "measurement_file": "../local_feeder/sensors/voltage_ids.json"
+            }
+        },
+        {
+            "name": "sensor_power_real",
+            "type": "MeasurementComponent",
+            "parameters": {
+                "gaussian_variance": 0.00,
+                "random_percent": 0.0,
+                "measurement_file": "../local_feeder/sensors/real_ids.json"
+            }
+        },
+        {
+            "name": "sensor_power_imaginary",
+            "type": "MeasurementComponent",
+            "parameters": {
+                "gaussian_variance": 0.0,
+                "random_percent": 0.0,
+                "measurement_file": "../local_feeder/sensors/reactive_ids.json"
+            }
+        },
+        {
+            "name": "recorder_estimated_real_PV",
+            "type": "Recorder",
+            "parameters": {"feather_filename": "../../outputs/13bus/estimated_real_PV.feather",
+                           "csv_filename": "../../outputs/13bus/estimated_real_PV.csv"
+                          }
+        },
+        {
+            "name": "recorder_estimated_imag_PV",
+            "type": "Recorder",
+            "parameters": {"feather_filename": "../../outputs/13bus/estimated_imag_PV.feather",
+                           "csv_filename": "../../outputs/13bus/estimated_imag_PV.csv"
+                          }
+        },
+        {
+            "name": "recorder_actual_real_PV",
+            "type": "Recorder",
+            "parameters": {"feather_filename": "../../outputs/13bus/actual_real_PV.feather",
+                           "csv_filename": "../../outputs/13bus/actual_real_PV.csv"
+                          }
+        },
+        {
+            "name": "recorder_actual_imag_PV",
+            "type": "Recorder",
+            "parameters": {"feather_filename": "../../outputs/13bus/actual_imag_PV.feather",
+                           "csv_filename": "../../outputs/13bus/actual_imag_PV.csv"
+                          }
+        }
+
+    ],
+    "links": [
+        {
+            "source": "local_feeder",
+            "source_port": "topology",
+            "target": "lindist_estimator",
+            "target_port": "topology"
+        },
+        {
+            "source": "local_feeder",
+            "source_port": "voltages_magnitude",
+            "target": "sensor_voltage_magnitude",
+            "target_port": "subscription"
+        },
+        {
+            "source": "local_feeder",
+            "source_port": "powers_real",
+            "target": "sensor_power_real",
+            "target_port": "subscription"
+        },
+        {
+            "source": "local_feeder",
+            "source_port": "powers_imag",
+            "target": "sensor_power_imaginary",
+            "target_port": "subscription"
+        },
+        {
+            "source": "sensor_voltage_magnitude",
+            "source_port": "publication",
+            "target": "lindist_estimator",
+            "target_port": "voltages_magnitude"
+        },
+        {
+            "source": "sensor_power_real",
+            "source_port": "publication",
+            "target": "lindist_estimator",
+            "target_port": "powers_real"
+        },
+        {
+            "source": "sensor_power_imaginary",
+            "source_port": "publication",
+            "target": "lindist_estimator",
+            "target_port": "powers_imaginary"
+        },
+        {
+            "source": "lindist_estimator",
+            "source_port": "pv_real",
+            "target": "recorder_estimated_real_PV",
+            "target_port": "subscription"
+        },
+        {
+            "source": "lindist_estimator",
+            "source_port": "pv_imag",
+            "target": "recorder_estimated_imag_PV",
+            "target_port": "subscription"
+        },
+        {
+            "source": "lindist_estimator",
+            "source_port": "pv_real_actual",
+            "target": "recorder_actual_real_PV",
+            "target_port": "subscription"
+        },
+        {
+            "source": "lindist_estimator",
+            "source_port": "pv_imag_actual",
+            "target": "recorder_actual_imag_PV",
+            "target_port": "subscription"
+        }
+    ]
+}
